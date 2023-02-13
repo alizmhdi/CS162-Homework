@@ -1,0 +1,128 @@
+GDB Practice:
+
+آ.
+cgdb map
+
+ب.
+break 14
+
+ج.
+run
+
+د.
+print argv
+argv = (char **) 0x7fffffffe3d8
+
+ه.
+print *argv
+*argv = 0x7fffffffe667 "/home/vagrant/code/handouts/HW0/map"
+
+و.
+break recur 
+continue
+
+ز.
+print &recur 
+recurAddress = (int (*)(int)) 0x5555555546cd <recur>
+
+ح.
+continue
+
+ط.
+break 8
+continue
+
+ی.
+layout asm
+
+ک
+break *recur+53
+continue
+
+
+ل.
+info reg
+
+rax            0x1      1
+rbx            0x0      0
+rcx            0x0      0
+rdx            0x0      0
+rsi            0x555555756340   93824994337600
+rdi            0x1      1
+rbp            0x7fffffffe280   0x7fffffffe280
+rsp            0x7fffffffe260   0x7fffffffe260
+r8             0x0      0
+r9             0x0      0
+r10            0x0      0
+r11            0x246    582
+r12            0x555555554580   93824992232832
+r13            0x7fffffffe3d0   140737488348112
+r14            0x0      0
+r15            0x0      0
+rip            0x555555554702   0x555555554702 <recur+53>
+eflags         0x202    [ IF ]
+cs             0x33     51
+ss             0x2b     43
+ds             0x0      0
+es             0x0      0
+fs             0x0      0
+gs             0x0      0
+
+م.
+step
+
+ن.
+layout src or disassemble
+
+س.
+#0  recur (i=1) at recurse.c:5
+#1  0x0000555555554707 in recur (i=2) at recurse.c:9
+#2  0x0000555555554707 in recur (i=3) at recurse.c:9
+#3  0x00005555555546c6 in main (argc=1, argv=0x7fffffffe3d8) at map.c:23
+
+A backtrace is a summary of how your program got where it is. It shows one line per frame, for many frames, starting with the currently executing frame (frame zero), followed by its caller (frame one), and on up the stack.
+
+ع.
+delete
+break recur if i==0
+
+ف.
+continue
+
+ص.
+backtrace
+
+#0  recur (i=0) at recurse.c:5
+#1  0x0000555555554707 in recur (i=1) at recurse.c:9
+#2  0x0000555555554707 in recur (i=2) at recurse.c:9
+#3  0x0000555555554707 in recur (i=3) at recurse.c:9
+#4  0x00005555555546c6 in main (argc=1, argv=0x7fffffffe3d8) at map.c:23
+
+ق.
+frame 4
+print argc
+argc = 1
+
+ر.
+break 12
+continue
+
+ش.
+layout asm //or disassemble
+
+ت.
+mov    $0x0,%eax
+leaveq
+retq
+
+ث.
+layout src
+
+خ.
+next 3
+
+ذ.
+continue
+
+ض.
+quit
