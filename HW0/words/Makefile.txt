@@ -1,0 +1,46 @@
+1. .DEFAULT_GOAL := default
+This line specifies what target should be executed by default if no target was specified in the command (actually the empty "make" command was executed).
+which is the "default" target selected here.
+
+In the continuation, various variables are defined that are used in the targets.
+
+3. CC?=gcc
+The cc variable specifies the compiler to use.
+4. CFLAGS?=-Wall
+In this line, the given flags(-Wall) are specified by the compilation command.
+5. SOURCES=main.c word_count.c
+In this line, the programs(main, word_count) to be compiled are defined in a variable
+6. LIBRARIES=wc_sort.o
+In this line, programs/objects(wc_sort.o) that are supposed to be used as libraries and linked with other programs are specified.
+7. BINARIES=words
+In this line, a variable is defined whose value is the name of the final binary file(words) in which the compilation output is dumped.
+
+10. %: %.c
+In this line, regex is used to define targets.
+In fact, this line states that the execution of any target with any name depends on the existence of a file with the same name and .c extension.
+For example, if the command "make abcd" is entered, this target will be executed if the file abcd.c exists.
+11. $(CC) $(CFLAGS) $(LIBRARIES) -o $@ $^
+Now, in this line, if anything matches the top line, the command "$(CC) $(CFLAGS) $(LIBRARIES) -o $@ $^" will be executed.
+In this command, $@ represents the prerequisite name(right side ':') and @^ represents the target name(left side ':').
+In general, the command is executed in the following command line:
+gcc -Wall wc_sort.o -o targetname targetname.c
+
+As a result, this target specifies that if there is a file named "test.c", it can be compiled with the help of "make test" and the binary output can be seen in the "test" file.
+("test" can be any name).
+
+13. clean:
+In this line, a new target named "clean" is defined.
+14. rm -f $(BINARIES)
+In this line, it is defined what the target "clean" is supposed to do and what happens when the "make clean" command is executed.
+Here, by executing this target, the command rm -f $(BINARIES) is executed, which deletes the binary file that is the result of compiling the code.
+
+16. executable:
+In this line, a new target named "executable" is defined.
+17. $(CC) $(CFLAGS) $(SOURCES) $(LIBRARIES) -o $(BINARIES)
+Here, by executing this target, the command "$(CC) $(CFLAGS) $(SOURCES) $(LIBRARIES) -o $(BINARIES)" is executed, 
+where the values ​​of the variables are placed instead of their names, and in fact, the command "gcc -Wall main.c word_count.c wc_sort.o -o words".
+This command compiles the suri files and links with the ws_sort.o file and dumps the binary output in the "words" file.
+
+19. default: executable
+In this line, a new target called "default" is defined, whose implementation depends on the execution of the "executable" target.
+In fact, by running the "default" target, The target "executable" is executed.
