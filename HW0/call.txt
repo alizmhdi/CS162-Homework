@@ -110,3 +110,90 @@ SYMBOL TABLE:
 7.
 gcc -m32 map.obj recurse.obj -o map
 
+Actually, by running this command, we compile and link all the files (map, recurse) together.
+As a result, the symbol tables of these two files are gathered in one place. 
+Therefore, we can say that the first difference is that in this part, the symbol table is the social output from the symbol table of individual files.
+
+Another difference is that the "recurse" symbol no longer has the *UND* flag.
+This is because in this file all the symbols are in one file and the "recurse" symbol is not defined in another file.
+
+objdump -t map
+
+SYMBOL TABLE:
+00000154 l    d  .interp	00000000              .interp
+00000168 l    d  .note.ABI-tag	00000000              .note.ABI-tag
+00000188 l    d  .note.gnu.build-id	00000000              .note.gnu.build-id
+000001ac l    d  .gnu.hash	00000000              .gnu.hash
+000001cc l    d  .dynsym	00000000              .dynsym
+0000025c l    d  .dynstr	00000000              .dynstr
+00000300 l    d  .gnu.version	00000000              .gnu.version
+00000314 l    d  .gnu.version_r	00000000              .gnu.version_r
+00000344 l    d  .rel.dyn	00000000              .rel.dyn
+00000384 l    d  .rel.plt	00000000              .rel.plt
+0000039c l    d  .init	00000000              .init
+000003c0 l    d  .plt	00000000              .plt
+00000400 l    d  .plt.got	00000000              .plt.got
+00000410 l    d  .text	00000000              .text
+00000674 l    d  .fini	00000000              .fini
+00000688 l    d  .rodata	00000000              .rodata
+00000694 l    d  .eh_frame_hdr	00000000              .eh_frame_hdr
+000006d8 l    d  .eh_frame	00000000              .eh_frame
+00001ed4 l    d  .init_array	00000000              .init_array
+00001ed8 l    d  .fini_array	00000000              .fini_array
+00001edc l    d  .dynamic	00000000              .dynamic
+00001fd4 l    d  .got	00000000              .got
+00002000 l    d  .data	00000000              .data
+0000200c l    d  .bss	00000000              .bss
+00000000 l    d  .comment	00000000              .comment
+00000000 l    df *ABS*	00000000              crtstuff.c
+00000460 l     F .text	00000000              deregister_tm_clones
+000004a0 l     F .text	00000000              register_tm_clones
+000004f0 l     F .text	00000000              __do_global_dtors_aux
+0000200c l     O .bss	00000001              completed.7282
+00001ed8 l     O .fini_array	00000000              __do_global_dtors_aux_fini_array_entry
+00000540 l     F .text	00000000              frame_dummy
+00001ed4 l     O .init_array	00000000              __frame_dummy_init_array_entry
+00000000 l    df *ABS*	00000000              map.c
+00000000 l    df *ABS*	00000000              recurse.c
+00000000 l    df *ABS*	00000000              crtstuff.c
+000007f4 l     O .eh_frame	00000000              __FRAME_END__
+00000000 l    df *ABS*	00000000              
+00001ed8 l       .init_array	00000000              __init_array_end
+00001edc l     O .dynamic	00000000              _DYNAMIC
+00001ed4 l       .init_array	00000000              __init_array_start
+00000694 l       .eh_frame_hdr	00000000              __GNU_EH_FRAME_HDR
+00001fd4 l     O .got	00000000              _GLOBAL_OFFSET_TABLE_
+00000670 g     F .text	00000002              __libc_csu_fini
+00000000  w      *UND*	00000000              _ITM_deregisterTMCloneTable
+00000450 g     F .text	00000004              .hidden __x86.get_pc_thunk.bx
+00002000  w      .data	00000000              data_start
+00000000       F *UND*	00000000              printf@@GLIBC_2.0
+0000200c g       .data	00000000              _edata
+00000674 g     F .fini	00000000              _fini
+000005ad g     F .text	00000052              recur
+00000549 g     F .text	00000000              .hidden __x86.get_pc_thunk.dx
+00000000  w    F *UND*	00000000              __cxa_finalize@@GLIBC_2.1.3
+00002008 g     O .data	00000004              stuff
+00000000       F *UND*	00000000              malloc@@GLIBC_2.0
+00002000 g       .data	00000000              __data_start
+00000000  w      *UND*	00000000              __gmon_start__
+00002004 g     O .data	00000000              .hidden __dso_handle
+0000068c g     O .rodata	00000004              _IO_stdin_used
+00000000       F *UND*	00000000              __libc_start_main@@GLIBC_2.0
+00000610 g     F .text	0000005d              __libc_csu_init
+00002010 g     O .bss	00000004              foo
+00002014 g       .bss	00000000              _end
+00000410 g     F .text	00000000              _start
+00000688 g     O .rodata	00000004              _fp_hw
+0000200c g       .bss	00000000              __bss_start
+0000054d g     F .text	00000060              main
+000005ff g     F .text	00000000              .hidden __x86.get_pc_thunk.ax
+0000200c g     O .data	00000000              .hidden __TMC_END__
+00000000  w      *UND*	00000000              _ITM_registerTMCloneTable
+0000039c g     F .init	00000000              _init
+
+
+Another difference is that in this part the symbols have addresses(In the previous episodes of Audrey, all symbols were zero).
+In fact, the first column represents the address of the symbol.
+Note that since we have compiled an executable binary file here, 
+the compiler has given the symbols an address of the memory so that the program can be executed and can be placed in the memory.
