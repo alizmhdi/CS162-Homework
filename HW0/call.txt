@@ -14,7 +14,11 @@ call    recur
 
 2.
 gcc -m32 -c map.S -o map.obj
+objdump -D map.obj
+
 gcc -m32 -c recurse.S -o recurse.obj
+objdump -D recurse.obj
+
 
 NOTE:
 There is no section named .section and as said on Discord it's a typographical mistakes!
