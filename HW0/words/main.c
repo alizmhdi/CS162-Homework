@@ -48,20 +48,22 @@ int num_words(FILE* infile) {
   int num_words = 0;
    char ch; 
    bool in_word = false;
+   bool word_check = true;
    while ((ch = fgetc(infile)) != EOF)
    {
       if (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r' || ch == '\v' || ch == '\f' || ch == '\0')
       {
-        if (in_word)
+        if (in_word & word_check)
         {
           num_words++;
         }
         in_word = false;
+	word_check = true;
       }
       else if (isalpha(ch))
         in_word = true;
       else
-	      in_word = false;
+	word_check = false;
    }
 
   return num_words;
@@ -78,16 +80,18 @@ void count_words(WordCount **wclist, FILE *infile) {
   char word[MAX_WORD_LEN];
   int i = 0;
   bool in_word = false;
+  bool word_check = true;
   while ((ch = fgetc(infile)) != EOF)
   {
     if (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r' || ch == '\v' || ch == '\f' || ch == '\0')
     {
-      if (in_word)
+      if (in_word & word_check)
       {
         word[i] = '\0';
         add_word(wclist, word);
       }
       i = 0;
+      word_check = true;
       in_word = false;
     }
     else if (isalpha(ch))
@@ -96,7 +100,7 @@ void count_words(WordCount **wclist, FILE *infile) {
       in_word = true;
     }
     else
-      in_word = false;
+      word_check = false;
   }
 }
 
