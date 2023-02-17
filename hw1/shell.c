@@ -45,7 +45,8 @@ fun_desc_t cmd_table[] = {
 };
 
 
-int cmd_help(tok_t arg[]) {
+int cmd_help(tok_t arg[]) 
+{
   int i;
   for (i=0; i < (sizeof(cmd_table)/sizeof(fun_desc_t)); i++) {
     printf("%s - %s\n",cmd_table[i].cmd, cmd_table[i].doc);
@@ -53,13 +54,15 @@ int cmd_help(tok_t arg[]) {
   return 1;
 }
 
-int cmd_quit(tok_t arg[]) {
+int cmd_quit(tok_t arg[]) 
+{
   printf("Bye\n");
   exit(0);
   return 1;
 }
 
-int cmd_cd(tok_t arg[]) {
+int cmd_cd(tok_t arg[]) 
+{
   int status_code = chdir(arg[0]);
   if (status_code != 0){
     printf("cd: no such file or directory: %s\n", arg[0]);
@@ -68,10 +71,10 @@ int cmd_cd(tok_t arg[]) {
   return 0;
 }
 
-int cmd_pwd(tok_t arg[]) {
-    int maxSize = 2048;
-    char * buffer = (char *) malloc(maxSize * sizeof(char));
-    char * result = getcwd(buffer, maxSize);
+int cmd_pwd(tok_t arg[]) 
+{
+    char * buffer = (char *) malloc(MAX_PATH_LENGTH * sizeof(char));
+    char * result = getcwd(buffer, MAX_PATH_LENGTH);
     if (result != NULL) {
       printf("%s\n", buffer);
       return 0;
@@ -80,7 +83,8 @@ int cmd_pwd(tok_t arg[]) {
 }
 
 
-int lookup(char cmd[]) {
+int lookup(char cmd[]) 
+{
   int i;
   for (i=0; i < (sizeof(cmd_table)/sizeof(fun_desc_t)); i++) {
     if (cmd && (strcmp(cmd_table[i].cmd, cmd) == 0)) return i;
@@ -117,6 +121,26 @@ void init_shell()
   /** YOUR CODE HERE */
 }
 
+int exec_external_program(tok_t * argv)
+{
+  char * inputPath = argv[0];
+  tok_t * paths = getToks(getenv("PATH"));
+  char * path = malloc(MAX_PATH_LENGTH * sizeof(char));
+  int i = 0;
+  while (paths[i]) {
+    strcpy(path, paths[i]); strcat(path, "/"); strcat(path, inputPath);
+
+    if (access(path, F_OK) == 0) {
+      execv(path, &argv[0]);
+      fflush(stdout);
+      return 1;
+    }
+
+    i++;
+  }
+  return 0;
+
+}
 
 /**
  * Add a process to our process list
@@ -137,7 +161,8 @@ process* create_process(char* inputString)
 
 
 
-int shell (int argc, char *argv[]) {
+int shell (int argc, char *argv[]) 
+{
   char *s = malloc(INPUT_STRING_SIZE+1);			/* user input string */
   tok_t *t;			/* tokens parsed from input */
   int lineNum = 0;
@@ -157,7 +182,11 @@ int shell (int argc, char *argv[]) {
     fundex = lookup(t[0]); /* Is first token a shell literal */
     if(fundex >= 0) cmd_table[fundex].fun(&t[1]);
     else {
-      fprintf(stdout, "This shell only supports built-ins. Replace this to run programs as commands.\n");
+      // int runable = exec_external_program(&t[0]);
+      // if (!runable && access(t[0], F_OK) == 0)
+      //     i = execv(t[0], &t[0]);
+      // else if (!runable)
+        fprintf(stdout, "This shell only supports built-ins. Replace this to run programs as commands.\n");
     }
     // fprintf(stdout, "%d: ", lineNum);
   }

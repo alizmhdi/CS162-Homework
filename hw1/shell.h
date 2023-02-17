@@ -1,5 +1,6 @@
 #ifndef _SHELL_H_
 #define _SHELL_H_
+#define MAX_PATH_LENGTH 2048
 
 #include <termios.h>
 #include "sys/types.h"
