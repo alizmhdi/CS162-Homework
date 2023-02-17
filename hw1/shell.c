@@ -17,14 +17,6 @@
 #include "process.h"
 #include "shell.h"
 
-int cmd_quit(tok_t arg[]) {
-  printf("Bye\n");
-  exit(0);
-  return 1;
-}
-
-int cmd_help(tok_t arg[]);
-
 
 /* Command Lookup table */
 typedef int cmd_fun_t (tok_t args[]); /* cmd functions take token array and return int */
@@ -34,10 +26,24 @@ typedef struct fun_desc {
   char *doc;
 } fun_desc_t;
 
+// commands:
+
+int cmd_quit(tok_t arg[]);
+
+int cmd_help(tok_t arg[]);
+
+int cmd_cd(tok_t arg[]);
+
+int cmd_pwd(tok_t arg[]);
+
+
 fun_desc_t cmd_table[] = {
+  {cmd_cd, "cd", "change the current working directory"},
+  {cmd_pwd, "pwd", "writes the full pathname of the current working directory"},
   {cmd_help, "?", "show this help menu"},
   {cmd_quit, "quit", "quit the command shell"},
 };
+
 
 int cmd_help(tok_t arg[]) {
   int i;
@@ -46,6 +52,33 @@ int cmd_help(tok_t arg[]) {
   }
   return 1;
 }
+
+int cmd_quit(tok_t arg[]) {
+  printf("Bye\n");
+  exit(0);
+  return 1;
+}
+
+int cmd_cd(tok_t arg[]) {
+  int status_code = chdir(arg[0]);
+  if (status_code != 0){
+    printf("cd: no such file or directory: %s\n", arg[0]);
+    return 1;
+  }
+  return 0;
+}
+
+int cmd_pwd(tok_t arg[]) {
+    int maxSize = 2048;
+    char * buffer = (char *) malloc(maxSize * sizeof(char));
+    char * result = getcwd(buffer, maxSize);
+    if (result != NULL) {
+      printf("%s\n", buffer);
+      return 0;
+    }
+    return 1;
+}
+
 
 int lookup(char cmd[]) {
   int i;
@@ -83,6 +116,7 @@ void init_shell()
   }
   /** YOUR CODE HERE */
 }
+
 
 /**
  * Add a process to our process list
