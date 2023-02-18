@@ -16,7 +16,7 @@ typedef struct process
   char background;
   int status;
   struct termios tmodes;
-  int stdin, stdout, stderr;
+  int stdIn, stdOut, stdErr;
   struct process* next;
   struct process* prev;
 } process;

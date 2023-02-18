@@ -92,6 +92,49 @@ int lookup(char cmd[])
   return -1;
 }
 
+
+/**
+ * Add a process to our process list
+ */
+void add_process(process * p)
+{
+  process * prev = first_process;
+
+  while (prev->next)
+      prev = prev->next;
+
+  prev->next = p;
+  p->prev = prev;
+}
+
+/**
+ * Creates a process given the inputString from stdin
+ */
+process * create_process(tok_t * inputString)
+{
+  process * p = (process*) malloc(sizeof(process));
+  p->argv = inputString;
+  p->argc = tokenLength(inputString);
+  p->pid = getpid();
+  p->completed = 0;
+  p->stopped = 0;
+  p->status = 0;
+
+  p->stdIn = 0;
+  p->stdOut = 1;
+  p->stdErr = 2;
+
+  p->prev = NULL;
+  p->next = NULL;
+  if (p->argv && strcmp(p->argv[p->argc - 1],"&") == 0){
+    p->background = 1;
+    p->argv[--p->argc] = NULL;
+  }
+
+  return p;
+}
+
+
 void init_shell()
 {
   /* Check if we are running interactively */
@@ -118,47 +161,8 @@ void init_shell()
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
   }
-  /** YOUR CODE HERE */
+  first_process = create_process(NULL);
 }
-
-int exec_external_program(tok_t * argv)
-{
-  char * inputPath = argv[0];
-  tok_t * paths = getToks(getenv("PATH"));
-  char * path = malloc(MAX_PATH_LENGTH * sizeof(char));
-  int i = 0;
-  while (paths[i]) {
-    strcpy(path, paths[i]); strcat(path, "/"); strcat(path, inputPath);
-
-    if (access(path, F_OK) == 0) {
-      execv(path, &argv[0]);
-      fflush(stdout);
-      return 1;
-    }
-
-    i++;
-  }
-  return 0;
-
-}
-
-/**
- * Add a process to our process list
- */
-void add_process(process* p)
-{
-  /** YOUR CODE HERE */
-}
-
-/**
- * Creates a process given the inputString from stdin
- */
-process* create_process(char* inputString)
-{
-  /** YOUR CODE HERE */
-  return NULL;
-}
-
 
 
 int shell (int argc, char *argv[]) 
@@ -170,7 +174,7 @@ int shell (int argc, char *argv[])
   pid_t pid = getpid();		/* get current processes PID */
   pid_t ppid = getppid();	/* get parents PID */
   pid_t cpid, tcpid, cpgid;
-
+  
   init_shell();
 
   // printf("%s running as PID %d under %d\n",argv[0],pid,ppid);
@@ -181,12 +185,21 @@ int shell (int argc, char *argv[])
     t = getToks(s); /* break the line into tokens */
     fundex = lookup(t[0]); /* Is first token a shell literal */
     if(fundex >= 0) cmd_table[fundex].fun(&t[1]);
-    else {
-      // int runable = exec_external_program(&t[0]);
-      // if (!runable && access(t[0], F_OK) == 0)
-      //     i = execv(t[0], &t[0]);
-      // else if (!runable)
-        fprintf(stdout, "This shell only supports built-ins. Replace this to run programs as commands.\n");
+    else if (t[0] != NULL) {
+      process * process = create_process(t);
+      add_process(process);
+
+      cpid = fork();
+      fprintf(stdout, cpid);
+      if (cpid == 0){
+        process->pid = getpid();
+        launch_process(process);
+      }
+      else
+      {
+        setpgid(pid, pid);
+        process->pid = pid;
+      }
     }
     // fprintf(stdout, "%d: ", lineNum);
   }
