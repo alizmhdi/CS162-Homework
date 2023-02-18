@@ -190,15 +190,18 @@ int shell (int argc, char *argv[])
       add_process(process);
 
       cpid = fork();
-      fprintf(stdout, cpid);
       if (cpid == 0){
         process->pid = getpid();
         launch_process(process);
       }
-      else
+      else if (cpid > 0)
       {
         setpgid(pid, pid);
         process->pid = pid;
+        if (!process->background){
+          int * status;
+          waitpid(-1, status, WUNTRACED);
+        }
       }
     }
     // fprintf(stdout, "%d: ", lineNum);
