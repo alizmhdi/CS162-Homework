@@ -88,7 +88,7 @@ int cmd_pwd(tok_t arg[])
 int cmd_wait(tok_t arg[])
 {
   int * status;
-  waitpid(-1, status, 0)
+  waitpid(-1, status, 0);
 }
 
 
