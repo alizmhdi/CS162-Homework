@@ -36,10 +36,13 @@ int cmd_cd(tok_t arg[]);
 
 int cmd_pwd(tok_t arg[]);
 
+int cmd_wait(tok_t arg[]);
+
 
 fun_desc_t cmd_table[] = {
   {cmd_cd, "cd", "change the current working directory"},
   {cmd_pwd, "pwd", "writes the full pathname of the current working directory"},
+  {cmd_wait, "wait", "wait for done all background process"},
   {cmd_help, "?", "show this help menu"},
   {cmd_quit, "quit", "quit the command shell"},
 };
@@ -80,6 +83,12 @@ int cmd_pwd(tok_t arg[])
       return 0;
     }
     return 1;
+}
+
+int cmd_wait(tok_t arg[])
+{
+  int * status;
+  waitpid(-1, status, 0)
 }
 
 
@@ -200,7 +209,7 @@ int shell (int argc, char *argv[])
         process->pid = pid;
         if (!process->background){
           int * status;
-          waitpid(-1, status, WUNTRACED);
+          waitpid(-1, status, 0);
         }
       }
     }
