@@ -113,12 +113,12 @@ setInputStd(process * p, int redirectIndex)
   if (p->argv[redirectIndex + 1] == NULL)
     return;
   int file = open(p->argv[redirectIndex + 1], O_RDONLY);
-  p->stdIn = file;
+  if (file >= 0)
+    p->stdIn = file;
   int i;
   for (i = redirectIndex; i < p->argc; i++) 
     p->argv[i] = NULL;
-  
-  p->argc = i-2;
+
 }
 
 void
@@ -127,13 +127,11 @@ setOutputStd(process * p, int redirectIndex)
   if (p->argv[redirectIndex + 1] == NULL)
     return;
   int file = open(p->argv[redirectIndex + 1], O_CREAT | O_TRUNC | O_WRONLY, 0777);
-  p->stdOut = file;
-
+  if (file >= 0)
+    p->stdOut = file;
   int i;
   for (i = redirectIndex; i < p->argc; i++) 
     p->argv[i] = NULL;
-
-  p->argc = i-2;
 
 }
 
@@ -176,6 +174,8 @@ create_process(tok_t * inputString)
     setInputStd(p, redirectIndex);
   if (p->argv && (redirectIndex = isDirectTok(p->argv, ">")) >= 0)
     setOutputStd(p, redirectIndex);
+
+  p->argc = tokenLength(p->argv);
 
   p->prev = NULL;
   p->next = NULL;
