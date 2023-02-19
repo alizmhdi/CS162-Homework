@@ -166,15 +166,13 @@ create_process(tok_t * inputString)
   p->stdIn = 0;
   p->stdOut = 1;
   p->stdErr = 2;
-
+  
   int redirectIndex;
   if (p->argv && (redirectIndex = isDirectTok(p->argv, "<")) >= 0)
     setInputStd(p, redirectIndex);
-  if (p->argv && (redirectIndex = isDirectTok(p->argv, ">")) >= 0){
+  if (p->argv && (redirectIndex = isDirectTok(p->argv, ">")) >= 0)
     setOutputStd(p, redirectIndex);
-    printf("%i\n", p->stdOut);
-    printf("%s\n", p->argv);
-  }
+
   p->prev = NULL;
   p->next = NULL;
   if (p->argv && strcmp(p->argv[p->argc - 1],"&") == 0){
