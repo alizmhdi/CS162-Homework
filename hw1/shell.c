@@ -119,6 +119,7 @@ setInputStd(process * p, int redirectIndex)
   for (i = redirectIndex; i < p->argc; i++) 
     p->argv[i] = NULL;
 
+  p->argc -= 2;
 }
 
 void
@@ -133,6 +134,7 @@ setOutputStd(process * p, int redirectIndex)
   for (i = redirectIndex; i < p->argc; i++) 
     p->argv[i] = NULL;
 
+  p->argc -= 2;
 }
 
 
@@ -174,8 +176,6 @@ create_process(tok_t * inputString)
     setInputStd(p, redirectIndex);
   if (p->argv && (redirectIndex = isDirectTok(p->argv, ">")) >= 0)
     setOutputStd(p, redirectIndex);
-
-  p->argc = tokenLength(p->argv);
 
   p->prev = NULL;
   p->next = NULL;
