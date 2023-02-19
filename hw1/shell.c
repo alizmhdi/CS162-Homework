@@ -110,6 +110,8 @@ int lookup(char cmd[])
 void
 setInputStd(process * p, int redirectIndex)
 {
+  if (p->argv[redirectIndex + 1] == NULL)
+    return;
   int file = open(p->argv[redirectIndex + 1], O_RDONLY);
   p->stdIn = file;
   int i;
@@ -122,6 +124,8 @@ setInputStd(process * p, int redirectIndex)
 void
 setOutputStd(process * p, int redirectIndex)
 {
+  if (p->argv[redirectIndex + 1] == NULL)
+    return;
   int file = open(p->argv[redirectIndex + 1], O_CREAT | O_TRUNC | O_WRONLY, 0777);
   p->stdOut = file;
 
@@ -166,7 +170,7 @@ create_process(tok_t * inputString)
   p->stdIn = 0;
   p->stdOut = 1;
   p->stdErr = 2;
-  
+
   int redirectIndex;
   if (p->argv && (redirectIndex = isDirectTok(p->argv, "<")) >= 0)
     setInputStd(p, redirectIndex);
