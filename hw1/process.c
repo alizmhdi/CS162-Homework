@@ -21,6 +21,9 @@ launch_process (process *p)
   tok_t * paths = getToks(getenv("PATH"));
   int pathsLen = tokenLength(paths);
   char * path = (char *)malloc(MAX_PATH_LENGTH * sizeof(char));
+  
+  dup2(p->stdIn, 0);
+  dup2(p->stdOut, 1);
 
   for(int i = 0; i<pathsLen; i++){
     strcpy(path, paths[i]); strcat(path, "/"); strcat(path, inputPath[0]);

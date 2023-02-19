@@ -7,6 +7,7 @@
 #include <termios.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 #define FALSE 0
 #define TRUE 1
@@ -48,7 +49,8 @@ fun_desc_t cmd_table[] = {
 };
 
 
-int cmd_help(tok_t arg[]) 
+int 
+cmd_help(tok_t arg[]) 
 {
   int i;
   for (i=0; i < (sizeof(cmd_table)/sizeof(fun_desc_t)); i++) {
@@ -57,14 +59,16 @@ int cmd_help(tok_t arg[])
   return 1;
 }
 
-int cmd_quit(tok_t arg[]) 
+int 
+cmd_quit(tok_t arg[]) 
 {
   printf("Bye\n");
   exit(0);
   return 1;
 }
 
-int cmd_cd(tok_t arg[]) 
+int 
+cmd_cd(tok_t arg[]) 
 {
   int status_code = chdir(arg[0]);
   if (status_code != 0){
@@ -74,7 +78,8 @@ int cmd_cd(tok_t arg[])
   return 0;
 }
 
-int cmd_pwd(tok_t arg[]) 
+int 
+cmd_pwd(tok_t arg[]) 
 {
     char * buffer = (char *) malloc(MAX_PATH_LENGTH * sizeof(char));
     char * result = getcwd(buffer, MAX_PATH_LENGTH);
@@ -85,7 +90,8 @@ int cmd_pwd(tok_t arg[])
     return 1;
 }
 
-int cmd_wait(tok_t arg[])
+int 
+cmd_wait(tok_t arg[])
 {
   int * status;
   waitpid(-1, status, 0);
@@ -101,11 +107,38 @@ int lookup(char cmd[])
   return -1;
 }
 
+void
+setInputStd(process * p, int redirectIndex)
+{
+  int file = open(p->argv[redirectIndex + 1], O_RDONLY);
+  p->stdIn = file;
+  int i;
+  for (i = redirectIndex; i < p->argc; i++) 
+    p->argv[i] = NULL;
+  
+  p->argc = i-2;
+}
+
+void
+setOutputStd(process * p, int redirectIndex)
+{
+  int file = open(p->argv[redirectIndex + 1], O_CREAT | O_TRUNC | O_WRONLY, 0777);
+  p->stdOut = file;
+
+  int i;
+  for (i = redirectIndex; i < p->argc; i++) 
+    p->argv[i] = NULL;
+
+  p->argc = i-2;
+
+}
+
 
 /**
  * Add a process to our process list
  */
-void add_process(process * p)
+void 
+add_process(process * p)
 {
   process * prev = first_process;
 
@@ -119,7 +152,8 @@ void add_process(process * p)
 /**
  * Creates a process given the inputString from stdin
  */
-process * create_process(tok_t * inputString)
+process * 
+create_process(tok_t * inputString)
 {
   process * p = (process*) malloc(sizeof(process));
   p->argv = inputString;
@@ -133,6 +167,14 @@ process * create_process(tok_t * inputString)
   p->stdOut = 1;
   p->stdErr = 2;
 
+  int redirectIndex;
+  if (p->argv && (redirectIndex = isDirectTok(p->argv, "<")) >= 0)
+    setInputStd(p, redirectIndex);
+  if (p->argv && (redirectIndex = isDirectTok(p->argv, ">")) >= 0){
+    setOutputStd(p, redirectIndex);
+    printf("%i\n", p->stdOut);
+    printf("%s\n", p->argv);
+  }
   p->prev = NULL;
   p->next = NULL;
   if (p->argv && strcmp(p->argv[p->argc - 1],"&") == 0){
@@ -144,7 +186,8 @@ process * create_process(tok_t * inputString)
 }
 
 
-void init_shell()
+void 
+init_shell()
 {
   /* Check if we are running interactively */
   shell_terminal = STDIN_FILENO;
@@ -174,7 +217,8 @@ void init_shell()
 }
 
 
-int shell (int argc, char *argv[]) 
+int 
+shell (int argc, char *argv[]) 
 {
   char *s = malloc(INPUT_STRING_SIZE+1);			/* user input string */
   tok_t *t;			/* tokens parsed from input */

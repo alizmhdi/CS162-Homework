@@ -46,7 +46,7 @@ int isDirectTok(tok_t *t, char *R) {
   for (i=0; i<MAXTOKS-1 && t[i]; i++) {
     if (strncmp(t[i],R,1) == 0) return i;
   }
-  return 0;
+  return -1;
 }
 
 int tokenLength(tok_t * toks){
