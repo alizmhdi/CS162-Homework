@@ -7,8 +7,6 @@
 #include <termios.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <fcntl.h>
-#include <sys/stat.h>
 
 
 #define FALSE 0
@@ -96,7 +94,8 @@ int
 cmd_wait(tok_t arg[])
 {
   int * status;
-  waitpid(-1, status, 0);
+  while (waitpid(-1, status, 0) > 0) {;}
+  return 1;
 }
 
 
@@ -107,87 +106,6 @@ int lookup(char cmd[])
     if (cmd && (strcmp(cmd_table[i].cmd, cmd) == 0)) return i;
   }
   return -1;
-}
-
-void
-setInputStd(process * p, int redirectIndex)
-{
-  if (p->argv[redirectIndex + 1] == NULL)
-    return;
-  int file = open(p->argv[redirectIndex + 1], O_RDONLY);
-  if (file >= 0)
-    p->stdIn = file;
-  int i;
-  for (i = redirectIndex; i < p->argc; i++) 
-    p->argv[i] = NULL;
-
-}
-
-void
-setOutputStd(process * p, int redirectIndex)
-{
-  if (p->argv[redirectIndex + 1] == NULL)
-    return;
-  int file = open(p->argv[redirectIndex + 1], O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR | S_IROTH | S_IWOTH);
-  if (file >= 0)
-    p->stdOut = file;
-  int i;
-  for (i = redirectIndex; i < p->argc; i++) 
-    p->argv[i] = NULL;
-
-}
-
-
-/**
- * Add a process to our process list
- */
-void 
-add_process(process * p)
-{
-  process * prev = first_process;
-
-  while (prev->next)
-      prev = prev->next;
-
-  prev->next = p;
-  p->prev = prev;
-}
-
-/**
- * Creates a process given the inputString from stdin
- */
-process * 
-create_process(tok_t * inputString)
-{
-  process * p = (process*) malloc(sizeof(process));
-  p->argv = inputString;
-  p->argc = tokenLength(inputString);
-  p->pid = NULL;
-  p->pgid = NULL;
-  p->completed = 0;
-  p->stopped = 0;
-  p->status = 0;
-
-  p->stdIn = 0;
-  p->stdOut = 1;
-  p->stdErr = 2;
-
-  int redirectIndex;
-  if (p->argv && (redirectIndex = isDirectTok(p->argv, "<")) >= 0)
-    setInputStd(p, redirectIndex);
-  if (p->argv && (redirectIndex = isDirectTok(p->argv, ">")) >= 0)
-    setOutputStd(p, redirectIndex);
-
-  p->argc = tokenLength(p->argv);
-
-  p->prev = NULL;
-  p->next = NULL;
-  if (p->argv && strcmp(p->argv[p->argc - 1],"&") == 0){
-    p->background = 1;
-    p->argv[--p->argc] = NULL;
-  }
-
-  return p;
 }
 
 
@@ -218,13 +136,15 @@ init_shell()
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
 
-    // signal(SIGINT, SIG_IGN);
-    // signal(SIGQUIT, SIG_IGN);
-    // signal(SIGTSTP, SIG_IGN);
-    // signal(SIGTTIN, SIG_IGN);
-    // signal(SIGTTOU, SIG_IGN);
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+    signal(SIGTSTP, SIG_IGN);
+    signal(SIGTTIN, SIG_IGN);
+    signal(SIGTTOU, SIG_IGN);
   }
+
   first_process = create_process(NULL);
+  first_process->pid = getpid();
 }
 
 
@@ -240,7 +160,7 @@ shell (int argc, char *argv[])
   pid_t cpid, tcpid, cpgid;
   
   init_shell();
-
+  
   // printf("%s running as PID %d under %d\n",argv[0],pid,ppid);
 
   lineNum=0;
@@ -250,29 +170,7 @@ shell (int argc, char *argv[])
     fundex = lookup(t[0]); /* Is first token a shell literal */
     if(fundex >= 0) cmd_table[fundex].fun(&t[1]);
     else if (t[0] != NULL) {
-      process * process = create_process(t);
-      add_process(process);
-
-      cpid = fork();
-      if (cpid == 0){
-        // signal(SIGINT, SIG_DFL);
-        // signal(SIGQUIT, SIG_DFL);
-        // signal(SIGTSTP, SIG_DFL);
-        // signal(SIGTTIN, SIG_DFL);
-        // signal(SIGTTOU, SIG_DFL);
-        process->pid = getpid();
-        setpgid(pid, pid);
-        launch_process(process);
-      }
-      else if (cpid > 0)
-      {
-        process->pid = pid;
-        if (!process->background){
-          // tcsetpgrp(STDIN_FILENO, process->pid);
-          int * status;
-          waitpid(cpid, status, 0);
-        }
-      }
+      run(t);
     }
   }
   return 0;
