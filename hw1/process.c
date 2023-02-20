@@ -103,7 +103,7 @@ launch_process (process *p)
   dup2(p->stdIn, 0);
   dup2(p->stdOut, 1);
 
-  if (access(inputPath, F_OK) == 0) {
+  if (access(p->argv[0], F_OK) == 0) {
     execv(p->argv[0], &inputPath[0]);
     return;
   }
