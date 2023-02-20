@@ -11,6 +11,7 @@ typedef struct process
   char** argv;
   int argc;
   pid_t pid;
+  pid_t pgid;
   char completed;
   char stopped;
   char background;

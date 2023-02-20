@@ -8,6 +8,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+
 
 #define FALSE 0
 #define TRUE 1
@@ -126,7 +128,7 @@ setOutputStd(process * p, int redirectIndex)
 {
   if (p->argv[redirectIndex + 1] == NULL)
     return;
-  int file = open(p->argv[redirectIndex + 1], O_CREAT | O_TRUNC | O_WRONLY, 0777);
+  int file = open(p->argv[redirectIndex + 1], O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR | S_IROTH | S_IWOTH);
   if (file >= 0)
     p->stdOut = file;
   int i;
@@ -160,7 +162,8 @@ create_process(tok_t * inputString)
   process * p = (process*) malloc(sizeof(process));
   p->argv = inputString;
   p->argc = tokenLength(inputString);
-  p->pid = getpid();
+  p->pid = NULL;
+  p->pgid = NULL;
   p->completed = 0;
   p->stopped = 0;
   p->status = 0;
@@ -214,6 +217,12 @@ init_shell()
     /* Take control of the terminal */
     tcsetpgrp(shell_terminal, shell_pgid);
     tcgetattr(shell_terminal, &shell_tmodes);
+
+    // signal(SIGINT, SIG_IGN);
+    // signal(SIGQUIT, SIG_IGN);
+    // signal(SIGTSTP, SIG_IGN);
+    // signal(SIGTTIN, SIG_IGN);
+    // signal(SIGTTOU, SIG_IGN);
   }
   first_process = create_process(NULL);
 }
@@ -246,20 +255,25 @@ shell (int argc, char *argv[])
 
       cpid = fork();
       if (cpid == 0){
+        // signal(SIGINT, SIG_DFL);
+        // signal(SIGQUIT, SIG_DFL);
+        // signal(SIGTSTP, SIG_DFL);
+        // signal(SIGTTIN, SIG_DFL);
+        // signal(SIGTTOU, SIG_DFL);
         process->pid = getpid();
+        setpgid(pid, pid);
         launch_process(process);
       }
       else if (cpid > 0)
       {
-        setpgid(pid, pid);
         process->pid = pid;
         if (!process->background){
+          // tcsetpgrp(STDIN_FILENO, process->pid);
           int * status;
-          waitpid(-1, status, 0);
+          waitpid(cpid, status, 0);
         }
       }
     }
-    // fprintf(stdout, "%d: ", lineNum);
   }
   return 0;
 }
