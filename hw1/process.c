@@ -10,7 +10,9 @@
 
 #include "parse.h"
 
-
+/**
+ * handle input redirect.
+ */
 void
 setInputStd(process * p, int redirectIndex)
 {
@@ -24,6 +26,9 @@ setInputStd(process * p, int redirectIndex)
     p->argv[i] = NULL;
 }
 
+/**
+ * handle output redirect.
+ */
 void
 setOutputStd(process * p, int redirectIndex)
 {
@@ -123,6 +128,9 @@ launch_process (process *p)
   fprintf(stdout,"This shell only supports built-ins. Replace this to run programs as commands.\n");
 }
 
+/**
+ * Set signals and run process.
+ */
 void
 run (tok_t * t)
 {
@@ -153,18 +161,3 @@ run (tok_t * t)
   }
 }
 
-/* Put a process in the foreground. This function assumes that the shell
- * is in interactive mode. If the cont argument is true, send the process
- * group a SIGCONT signal to wake it up.
- */
-void
-put_process_in_foreground (process *p, int cont)
-{
-}
-
-/* Put a process in the background. If the cont argument is true, send
- * the process group a SIGCONT signal to wake it up. */
-void
-put_process_in_background (process *p, int cont)
-{
-}
