@@ -34,10 +34,10 @@ int server_proxy_port;
 #define MAX_SIZE 16384
 #define MAX_PATH_LENGTH 1024
 
-void send_file_to_client(int socker, char *file_path) {
+void send_file_to_client(int socket, char *file_path) {
   int file = open(file_path, 0);
   void *buffer = malloc(MAX_SIZE);
-  unsigned int size;
+  size_t size;
   while ((size = read(file, buffer, MAX_SIZE)) > 0)
     http_send_data(socket, buffer, size);
 
@@ -60,8 +60,9 @@ void serve_file(int fd, char *path, struct stat *st) {
 
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(path));
-  http_send_header(fd, "Content-Length", size); // Change this too
+  http_send_header(fd, "Content-Length", content_size);
   http_end_headers(fd);
+  printf("1");
 
   send_file_to_client(fd, path);
   free(content_size);
@@ -87,8 +88,8 @@ void serve_directory(int fd, char *path) {
       http_send_string(fd, string);
     }
     free(string);
-    closedir(dir);
   }
+  closedir(dir);
 }
 
 
