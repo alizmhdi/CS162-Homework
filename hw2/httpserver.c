@@ -222,11 +222,19 @@ void handle_proxy_request(int fd) {
   */
 }
 
+void * thread_handler(void *args) {
+  void (*func)(int) = args;
+  while (1) {
+    int fd = wq_pop(&work_queue);
+    func(fd);
+    close(fd);
+  }
+}
 
 void init_thread_pool(int num_threads, void (*request_handler)(int)) {
-  /*
-   * TODO: Part of your solution for Task 2 goes here!
-   */
+  pthread_t pthread[num_threads];
+  for (int i = 0; i < num_threads; i++)
+    pthread_create(&pthread[i], NULL, thread_handler, request_handler);
 }
 
 /*
@@ -271,6 +279,7 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
 
   printf("Listening on port %d...\n", server_port);
 
+  wq_init(&work_queue);
   init_thread_pool(num_threads, request_handler);
 
   while (1) {
@@ -286,13 +295,12 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
         inet_ntoa(client_address.sin_addr),
         client_address.sin_port);
 
-    // TODO: Change me?
-    request_handler(client_socket_number);
-    close(client_socket_number);
-
-    printf("Accepted connection from %s on port %d\n",
-        inet_ntoa(client_address.sin_addr),
-        client_address.sin_port);
+    if (num_threads == 0) {
+      wq_push(&work_queue, client_socket_number);
+    } else {
+      request_handler(client_socket_number);
+      close(client_socket_number);
+    }
   }
 
   shutdown(*socket_number, SHUT_RDWR);
