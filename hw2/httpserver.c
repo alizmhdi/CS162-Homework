@@ -34,14 +34,12 @@ int server_proxy_port;
 #define MAX_SIZE 16384
 
 
-void send_file_to_client(int socket, char *file_path) {
-  int file = open(file_path, 0);
+void send_to_client(int dst, int src) {
   void *buffer = malloc(MAX_SIZE);
   size_t size;
-  while ((size = read(file, buffer, MAX_SIZE)) > 0)
-    http_send_data(socket, buffer, size);
+  while ((size = read(src, buffer, MAX_SIZE)) > 0)
+    http_send_data(dst, buffer, size);
 
-  close(file);
   free(buffer);
 }
 
@@ -63,9 +61,11 @@ void serve_file(int fd, char *path, struct stat *st) {
   http_send_header(fd, "Content-Type", http_get_mime_type(path));
   http_send_header(fd, "Content-Length", content_size);
   http_end_headers(fd);
-  printf("1");
 
-  send_file_to_client(fd, path);
+  int file = open(path, 0);
+  send_to_client(fd, file);
+
+  close(file);
   free(content_size);
 }
 
@@ -75,6 +75,7 @@ void send_404_not_found(int fd) {
   http_send_header(fd, "Content-Type", "text/html");
   http_end_headers(fd);
 }
+
 
 void serve_directory(int fd, char *path) {
   http_start_response(fd, 200);
@@ -158,6 +159,70 @@ void handle_files_request(int fd) {
 }
 
 
+typedef struct proxy_status {
+  int src_socket;
+  int dst_socket;
+  pthread_cond_t *cond;
+  int alive;
+} proxy_status;
+
+
+struct proxy_status * create_proxy_status(int src, int dst, int alive, pthread_cond_t *cond) {
+  proxy_status *proxy_status = (struct proxy_status*) malloc(sizeof(proxy_status));
+  proxy_status->src_socket = src;
+  proxy_status->dst_socket = dst;
+  proxy_status->alive = alive;
+  proxy_status->cond = cond;
+
+  return proxy_status;
+}
+
+
+void *run_proxy(void *args) {
+  proxy_status *pstatus = (proxy_status *) args;
+  send_to_client(pstatus->dst_socket, pstatus->src_socket);
+  pstatus->alive = 0;
+  pthread_cond_signal(pstatus->cond);
+}
+
+
+void send_502_bad_gateway(int fd, int target_fd) {
+  http_request_parse(fd);
+  http_start_response(fd, 502);
+  http_send_header(fd, "Content-Type", "text/html");
+  http_end_headers(fd);
+  http_send_string(fd, "<center><h1>502 Bad Gateway</h1><hr></center>");
+  close(target_fd);
+  close(fd);
+}
+
+
+void handle_proxy(int fd, int target_fd) {
+  pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+  pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+  proxy_status *request_status = create_proxy_status(fd, target_fd, 1, &cond);
+  proxy_status *response_status = create_proxy_status(target_fd, fd, 1, &cond);
+
+  pthread_t request_thread, response_thread;
+
+  pthread_create(&request_thread, NULL, run_proxy, request_status);
+  pthread_create(&response_thread, NULL, run_proxy, response_status);
+
+  while (request_status->alive && response_status->alive)
+    pthread_cond_wait(&cond, &mutex);
+
+  pthread_cancel(request_thread);
+  pthread_cancel(response_thread);
+  free(request_status);
+  free(response_status);
+  close(fd);
+  close(target_fd);
+
+  pthread_mutex_destroy(&mutex);
+  pthread_cond_destroy(&cond);
+}
+
 /*
  * Opens a connection to the proxy target (hostname=server_proxy_hostname and
  * port=server_proxy_port) and relays traffic to/from the stream fd and the
@@ -203,23 +268,10 @@ void handle_proxy_request(int fd) {
   int connection_status = connect(target_fd, (struct sockaddr*) &target_address,
       sizeof(target_address));
 
-  if (connection_status < 0) {
-    /* Dummy request parsing, just to be compliant. */
-    http_request_parse(fd);
-
-    http_start_response(fd, 502);
-    http_send_header(fd, "Content-Type", "text/html");
-    http_end_headers(fd);
-    http_send_string(fd, "<center><h1>502 Bad Gateway</h1><hr></center>");
-    close(target_fd);
-    close(fd);
-    return;
-
-  }
-
-  /* 
-  * TODO: Your solution for task 3 belongs here! 
-  */
+  if (connection_status < 0)
+    send_502_bad_gateway(fd, target_fd);
+  else
+    handle_proxy(fd, target_fd);
 }
 
 void * thread_handler(void *args) {
