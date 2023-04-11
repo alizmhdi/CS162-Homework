@@ -32,7 +32,7 @@ char *server_proxy_hostname;
 int server_proxy_port;
 
 #define MAX_SIZE 16384
-#define MAX_PATH_LENGTH 1024
+
 
 void send_file_to_client(int socket, char *file_path) {
   int file = open(file_path, 0);
