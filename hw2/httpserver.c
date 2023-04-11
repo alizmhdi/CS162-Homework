@@ -31,6 +31,20 @@ char *server_files_directory;
 char *server_proxy_hostname;
 int server_proxy_port;
 
+#define MAX_SIZE 16384
+#define MAX_PATH_LENGTH 1024
+
+void send_file_to_client(int socker, char *file_path) {
+  int file = open(file_path, 0);
+  void *buffer = malloc(MAX_SIZE);
+  unsigned int size;
+  while ((size = read(file, buffer, MAX_SIZE)) > 0)
+    http_send_data(socket, buffer, size);
+
+  close(file);
+  free(buffer);
+}
+
 /*
  * Serves the contents the file stored at `path` to the client socket `fd`.
  * It is the caller's reponsibility to ensure that the file stored at `path` exists.
@@ -39,15 +53,24 @@ int server_proxy_port;
  * ATTENTION: Be careful to optimize your code. Judge is
  *            sesnsitive to time-out errors.
  */
-void serve_file(int fd, char *path) {
+void serve_file(int fd, char *path, struct stat *st) {
+  long size = st->st_size;
+  char *content_size = malloc(MAX_SIZE * sizeof(char));
+  sprintf(content_size, "%ld", size);
 
   http_start_response(fd, 200);
   http_send_header(fd, "Content-Type", http_get_mime_type(path));
-  http_send_header(fd, "Content-Length", "0"); // Change this too
+  http_send_header(fd, "Content-Length", size); // Change this too
   http_end_headers(fd);
 
-  /* TODO: PART 1 Bullet 2 */
+  send_file_to_client(fd, path);
+  free(content_size);
+}
 
+void send_404_not_found(int fd) {
+  http_start_response(fd, 404);
+  http_send_header(fd, "Content-Type", "text/html");
+  http_end_headers(fd);
 }
 
 void serve_directory(int fd, char *path) {
@@ -55,8 +78,17 @@ void serve_directory(int fd, char *path) {
   http_send_header(fd, "Content-Type", http_get_mime_type(".html"));
   http_end_headers(fd);
 
-  /* TODO: PART 1 Bullet 3,4 */
-
+  DIR *dir = opendir(path);
+  if (dir) {
+    char *string = malloc(MAX_SIZE);
+    struct dirent *dirent;
+    while ((dirent = readdir(dir)) != NULL) {
+      snprintf(string, MAX_SIZE, "<a href='./%s'>%s</a><br>\n", dirent->d_name, dirent->d_name);
+      http_send_string(fd, string);
+    }
+    free(string);
+    closedir(dir);
+  }
 }
 
 
@@ -93,33 +125,31 @@ void handle_files_request(int fd) {
     return;
   }
 
-  /* Remove beginning `./` */
-  char *path = malloc(2 + strlen(request->path) + 1);
-  path[0] = '.';
-  path[1] = '/';
-  memcpy(path + 2, request->path, strlen(request->path) + 1);
+  char *path = malloc(strlen(server_files_directory) + strlen(request->path));
+  strcpy(path, server_files_directory);
+  strcat(path, request->path);
 
-  /* 
-   * TODO: First is to serve files. If the file given by `path` exists,
-   * call serve_file() on it. Else, serve a 404 Not Found error below.
-   *
-   * TODO: Second is to serve both files and directories. You will need to
-   * determine when to call serve_file() or serve_directory() depending
-   * on `path`.
-   *  
-   * Feel FREE to delete/modify anything on this function.
-   */
+  struct stat file_stat;
+  stat(path, &file_stat);
 
-  http_start_response(fd, 200);
-  http_send_header(fd, "Content-Type", "text/html");
-  http_end_headers(fd);
-  http_send_string(fd,
-      "<center>"
-      "<h1>Welcome to httpserver!</h1>"
-      "<hr>"
-      "<p>Nothing's here yet.</p>"
-      "</center>");
+  if (S_ISREG(file_stat.st_mode)) {
+    serve_file(fd, path, &file_stat);
+  } else if (S_ISDIR(file_stat.st_mode)) {
+    char *index_path = malloc(strlen(path) + strlen("/index.html"));
+    strcpy(index_path, path);
+    strcat(index_path, "/index.html");
+    if (stat(index_path, &file_stat) == 0)
+      serve_file(fd, index_path, &file_stat);
 
+    else
+      serve_directory(fd, path);
+
+    free(index_path);
+  } else
+    send_404_not_found(fd);
+
+  free(path);
+  free(request);
   close(fd);
   return;
 }
