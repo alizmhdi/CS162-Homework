@@ -45,6 +45,7 @@ void send_file_to_client(int socket, char *file_path) {
   free(buffer);
 }
 
+
 /*
  * Serves the contents the file stored at `path` to the client socket `fd`.
  * It is the caller's reponsibility to ensure that the file stored at `path` exists.
@@ -67,6 +68,7 @@ void serve_file(int fd, char *path, struct stat *st) {
   send_file_to_client(fd, path);
   free(content_size);
 }
+
 
 void send_404_not_found(int fd) {
   http_start_response(fd, 404);
