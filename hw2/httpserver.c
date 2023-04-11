@@ -223,6 +223,7 @@ void handle_proxy(int fd, int target_fd) {
   pthread_cond_destroy(&cond);
 }
 
+
 /*
  * Opens a connection to the proxy target (hostname=server_proxy_hostname and
  * port=server_proxy_port) and relays traffic to/from the stream fd and the
@@ -274,6 +275,7 @@ void handle_proxy_request(int fd) {
     handle_proxy(fd, target_fd);
 }
 
+
 void * thread_handler(void *args) {
   void (*func)(int) = args;
   while (1) {
@@ -283,11 +285,13 @@ void * thread_handler(void *args) {
   }
 }
 
+
 void init_thread_pool(int num_threads, void (*request_handler)(int)) {
   pthread_t pthread[num_threads];
   for (int i = 0; i < num_threads; i++)
     pthread_create(&pthread[i], NULL, thread_handler, request_handler);
 }
+
 
 /*
  * Opens a TCP stream socket on all interfaces with port number PORTNO. Saves
@@ -359,6 +363,7 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
   close(*socket_number);
 }
 
+
 int server_fd;
 void signal_callback_handler(int signum) {
   printf("Caught signal %d: %s\n", signum, strsignal(signum));
@@ -375,6 +380,7 @@ void exit_with_usage() {
   fprintf(stderr, "%s", USAGE);
   exit(EXIT_SUCCESS);
 }
+
 
 int main(int argc, char **argv) {
   signal(SIGINT, signal_callback_handler);
