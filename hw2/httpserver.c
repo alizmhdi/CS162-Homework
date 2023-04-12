@@ -31,7 +31,7 @@ char *server_files_directory;
 char *server_proxy_hostname;
 int server_proxy_port;
 
-#define MAX_SIZE 16384
+#define MAX_SIZE 8192
 
 
 void send_to_client(int dst, int src) {
@@ -153,7 +153,6 @@ void handle_files_request(int fd) {
     send_404_not_found(fd);
 
   free(path);
-  free(request);
   close(fd);
   return;
 }
@@ -183,6 +182,7 @@ void *run_proxy(void *args) {
   send_to_client(pstatus->dst_socket, pstatus->src_socket);
   pstatus->alive = 0;
   pthread_cond_signal(pstatus->cond);
+  return NULL;
 }
 
 
@@ -214,13 +214,14 @@ void handle_proxy(int fd, int target_fd) {
 
   pthread_cancel(request_thread);
   pthread_cancel(response_thread);
+  pthread_mutex_destroy(&mutex);
+  pthread_cond_destroy(&cond);
+
   free(request_status);
   free(response_status);
   close(fd);
   close(target_fd);
-
-  pthread_mutex_destroy(&mutex);
-  pthread_cond_destroy(&cond);
+  
 }
 
 
@@ -351,7 +352,7 @@ void serve_forever(int *socket_number, void (*request_handler)(int)) {
         inet_ntoa(client_address.sin_addr),
         client_address.sin_port);
 
-    if (num_threads == 0) {
+    if (num_threads != 0) {
       wq_push(&work_queue, client_socket_number);
     } else {
       request_handler(client_socket_number);
@@ -380,7 +381,6 @@ void exit_with_usage() {
   fprintf(stderr, "%s", USAGE);
   exit(EXIT_SUCCESS);
 }
-
 
 int main(int argc, char **argv) {
   signal(SIGINT, signal_callback_handler);
