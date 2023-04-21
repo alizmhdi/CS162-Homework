@@ -73,15 +73,18 @@ s_block_ptr get_block (void *ptr)
 
 void fusion(s_block_ptr block)
 {
-    if (block->prev != NULL && (block->prev)->is_free == 1) {
+    if (block->prev != NULL && (block->prev)->is_free) {
         (block->prev)->is_free = block->is_free;
         (block->prev)->next = block->next;
         (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
+        if ((block->prev)->prev != NULL)
+            block->prev = block->prev->prev;
         if (block->next != NULL)
             (block->next)->prev = block->prev;
+        
     }
-    
-    if (block->next != NULL && (block->next)->is_free == 1) {
+
+    if (block->next != NULL && (block->next)->is_free) {
         block->next = (block->next)->next;
         (block->next)->prev = block;
         block->size = block->size + sizeof(s_block) +(block->next)->size;
@@ -125,10 +128,18 @@ void* mm_realloc(void* ptr, size_t size)
     if (block){
         void *new = mm_malloc(size);
 
-        memcpy(new, ptr, block->size);
+        if (size > block->size) {
+            memcpy(new, ptr, block->size);
+            block->is_free = 1;
+            fusion(block);
+            return new;
+        }
+
+        memcpy(new, ptr, size);
         block->is_free = 1;
         fusion(block);
-        return new;
+        return block->ptr;
+        
     }
     return NULL;
 
