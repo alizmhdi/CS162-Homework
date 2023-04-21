@@ -75,6 +75,12 @@ s_block_ptr get_block (void *ptr)
 
 void fusion(s_block_ptr block)
 {
+    if (block->next != NULL && (block->next)->is_free == 1) {
+        block->next = (block->next)->next;
+        (block->next)->prev = block;
+        block->size = block->size + sizeof(s_block) +(block->next)->size;
+    }
+
     if (block->prev != NULL && (block->prev)->is_free == 1) {
         (block->prev)->is_free = block->is_free;
         (block->prev)->next = block->next;
@@ -82,30 +88,6 @@ void fusion(s_block_ptr block)
         if (block->next != NULL)
             (block->next)->prev = block->prev;
     }
-
-    if (block->next != NULL && (block->next)->is_free == 1) {
-        block->next = (block->next)->next;
-        (block->next)->prev = block;
-        block->size = block->size + sizeof(s_block) +(block->next)->size;
-    }
-}
-
-
-void *initial_heap(size_t size) {
-
-    if (sbrk(size + sizeof(s_block)) == (void *)-1)
-        return NULL;
-
-    head_pointer = sbrk(0);
-
-    head_pointer->next = NULL;
-    head_pointer->prev = NULL;
-    head_pointer->size = size ;
-    head_pointer->is_free = 0;
-    head_pointer->ptr = head_pointer + sizeof(s_block);
-
-    memset(head_pointer->ptr, 0, head_pointer->size);
-    return head_pointer->ptr;
 }
 
 
