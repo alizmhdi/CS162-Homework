@@ -111,7 +111,6 @@ void *initial_heap(size_t size) {
 
 void* mm_malloc(size_t size)
 {
-    return 0;
     if (size == 0)
         return NULL;
 
@@ -157,7 +156,6 @@ void* mm_realloc(void* ptr, size_t size)
 
 void mm_free(void* ptr)
 {
-    return;
     if (ptr == NULL)
         return;
     
