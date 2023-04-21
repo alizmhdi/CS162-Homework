@@ -20,9 +20,8 @@ void split_block (s_block_ptr block, size_t size)
     if (block == NULL || size <= 0)
         return;
 
-    int s_block_size = sizeof(s_block);
 
-    if(block->size >= size + s_block_size) {
+    if(block->size >= size + sizeof(s_block)) {
         s_block_ptr ptr = (s_block_ptr) (block->ptr + size);
         
         if (block->next)
@@ -31,9 +30,9 @@ void split_block (s_block_ptr block, size_t size)
         ptr->prev = block;
         ptr->next = block->next;
         block->next = ptr;
-        ptr->size = block->size - size - s_block_size;
+        ptr->size = block->size - size - sizeof(s_block);
         block->size = size;
-        ptr->ptr = block->ptr + size + s_block_size;
+        ptr->ptr = block->ptr + size + sizeof(s_block);
         
         mm_free(ptr->ptr);
         memset(block->ptr, 0, block->size);
