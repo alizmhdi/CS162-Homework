@@ -116,7 +116,7 @@ void* mm_malloc(size_t size)
 
     if (head_pointer == NULL)
         return initial_heap(size);
-        
+
     s_block_ptr prev = NULL;
 
     for (s_block_ptr head = head_pointer; head; head = head->next)
@@ -134,7 +134,22 @@ void* mm_malloc(size_t size)
 
 void* mm_realloc(void* ptr, size_t size)
 {
-    return 0;
+    if (ptr == NULL)
+        return mm_malloc(size);
+    
+    if (size == 0)
+        return NULL;
+
+    s_block_ptr block = get_block(ptr);
+    if (block){
+        void *new = mm_malloc(size);
+
+        memcpy(new, ptr, block->size);
+        block->is_free = 1;
+        fusion(block);
+        return new;
+    }
+    return NULL;
 }
 
 void mm_free(void* ptr)
