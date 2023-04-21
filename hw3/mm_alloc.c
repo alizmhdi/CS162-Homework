@@ -18,20 +18,18 @@ void split_block (s_block_ptr block, size_t size)
     if (block == NULL || size <= 0)
         return;
 
-
     if(block->size >= size + sizeof(s_block)) {
         s_block_ptr ptr = (s_block_ptr) (block->ptr + size);
-        
+        ptr->prev = block;
         if (block->next)
             (block->next)->prev = ptr;
 
-        ptr->prev = block;
         ptr->next = block->next;
         block->next = ptr;
         ptr->size = block->size - size - sizeof(s_block);
-        block->size = size;
         ptr->ptr = block->ptr + size + sizeof(s_block);
-        
+        block->size = size;
+
         mm_free(ptr->ptr);
         memset(block->ptr, 0, block->size);
     }
@@ -75,18 +73,18 @@ s_block_ptr get_block (void *ptr)
 
 void fusion(s_block_ptr block)
 {
-    if (block->next != NULL && (block->next)->is_free == 1) {
-        block->next = (block->next)->next;
-        (block->next)->prev = block;
-        block->size = block->size + sizeof(s_block) +(block->next)->size;
-    }
-
     if (block->prev != NULL && (block->prev)->is_free == 1) {
         (block->prev)->is_free = block->is_free;
         (block->prev)->next = block->next;
         (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
         if (block->next != NULL)
             (block->next)->prev = block->prev;
+    }
+    
+    if (block->next != NULL && (block->next)->is_free == 1) {
+        block->next = (block->next)->next;
+        (block->next)->prev = block;
+        block->size = block->size + sizeof(s_block) +(block->next)->size;
     }
 }
 
