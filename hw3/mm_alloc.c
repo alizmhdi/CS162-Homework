@@ -116,7 +116,7 @@ void* mm_malloc(size_t size)
 
     if (head_pointer == NULL)
         return initial_heap(size);
-    printf("12");
+        
     s_block_ptr prev = NULL;
 
     for (s_block_ptr head = head_pointer; head; head = head->next)
