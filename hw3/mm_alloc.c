@@ -78,7 +78,7 @@ void fusion(s_block_ptr block)
         (block->next)->prev = block;
         block->size = block->size + sizeof(s_block) +(block->next)->size;
     }
-    
+
     if (block->prev != NULL && (block->prev)->is_free) {
         (block->prev)->is_free = block->is_free;
         (block->prev)->next = block->next;
@@ -87,9 +87,7 @@ void fusion(s_block_ptr block)
             block->prev = block->prev->prev;
         if (block->next != NULL)
             (block->next)->prev = block->prev;
-        
     }
-
 }
 
 
