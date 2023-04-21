@@ -1,4 +1,4 @@
-I finished judging your code on 21-04-2023 at 11:33:38.
+I finished judging your code on 21-04-2023 at 11:37:19.
 
 I ran your code on each test case separately! You can see the results below:
 
@@ -14,12 +14,7 @@ Malloc didn't crash!
 
 
 ================================================================================================================
-Test 2: Test of exceptional cases --> OK! 2.15 points; Afarin!!!
-================================================================================================================
-
-
-================================================================================================================
-Test 3: Fusion simple test --> Runtime error occurred (Exit code: -11)
+Test 2: Test of exceptional cases --> Runtime error occurred (Exit code: -11)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
@@ -29,7 +24,62 @@ Although you got no points from this test, below is the output of the test (STDO
 
 
 ================================================================================================================
-Test 4: Fusion complicated test --> Runtime error occurred (Exit code: -11)
+Test 3: Fusion simple test --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+You must have allocated more...
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 4: Fusion complicated test --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+You must have allocated more...
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 5: Split block simple test --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+You must have allocated more...
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 6: Test large amount of data --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+You must have allocated more...
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 7: A combination of fusion and split block --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+You must have allocated more...
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 8: Realloc simple test --> Runtime error occurred (Exit code: -11)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
@@ -39,52 +89,11 @@ Although you got no points from this test, below is the output of the test (STDO
 
 
 ================================================================================================================
-Test 5: Split block simple test --> Runtime error occurred (Exit code: -11)
+Test 9: Realloc complicated test --> Runtime error occurred (Exit code: 1)
 Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
-
------------<END AUTO GENERATED OUTPUT>------------
-================================================================================================================
-
-
-================================================================================================================
-Test 6: Test large amount of data --> Runtime error occurred (Exit code: -11)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
-
------------<END AUTO GENERATED OUTPUT>------------
-================================================================================================================
-
-
-================================================================================================================
-Test 7: A combination of fusion and split block --> Runtime error occurred (Exit code: -11)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
-
------------<END AUTO GENERATED OUTPUT>------------
-================================================================================================================
-
-
-================================================================================================================
-Test 8: Realloc simple test --> Runtime error occurred (Exit code: 1)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
-
-Wrong realloc 3
-
------------<END AUTO GENERATED OUTPUT>------------
-================================================================================================================
-
-
-================================================================================================================
-Test 9: Realloc complicated test --> Runtime error occurred (Exit code: -11)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
+You must have allocated more...
 
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
@@ -99,4 +108,4 @@ Although you got no points from this test, below is the output of the test (STDO
 -----------<END AUTO GENERATED OUTPUT>------------
 ================================================================================================================
 
-Your final grade is: 2.15/100.0epoch: 1682076818
+Your final grade is: 0/100.0epoch: 1682077039
