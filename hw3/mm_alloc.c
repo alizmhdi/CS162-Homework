@@ -44,6 +44,9 @@ s_block_ptr extend_heap (s_block_ptr last , size_t s)
 {
     void *ptr = sbrk(s + sizeof(s_block));
 
+    if (ptr == (void *) -1)
+        return NULL;
+
     s_block_ptr block = (s_block_ptr) ptr;
     if (last)
         last->next = block;
