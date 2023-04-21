@@ -1,8 +1,6 @@
 /*
  * mm_alloc.c
  *
- * Stub implementations of the mm_* routines. Remove this comment and provide
- * a summary of your allocator's design here.
  */
 
 #include "mm_alloc.h"
@@ -107,6 +105,7 @@ void *initial_heap(size_t size) {
     memset(head_pointer->ptr, 0, head_pointer->size);
     return head_pointer->ptr;
 }
+
 
 void* mm_malloc(size_t size)
 {
