@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <memory.h>
+#include <stdio.h>
 
 
 s_block_ptr head_pointer = NULL;
@@ -48,12 +49,9 @@ s_block_ptr extend_heap (s_block_ptr last , size_t s)
         return NULL;
 
     s_block_ptr block = (s_block_ptr) ptr;
+
     if (last)
         last->next = block;
-    else 
-        head_pointer = block;
-
-    memset(block->ptr, 0, block->size);
 
     block->next = NULL;
     block->prev = last;
@@ -61,9 +59,10 @@ s_block_ptr extend_heap (s_block_ptr last , size_t s)
     block->size = s;
     block->ptr = ptr + sizeof(s_block);
 
+    memset(block->ptr, 0, block->size);
+
     return block->ptr;
 }
-
 
 s_block_ptr get_block (void *ptr)
 {
@@ -77,30 +76,47 @@ s_block_ptr get_block (void *ptr)
 
 void fusion(s_block_ptr block)
 {
-    if ((block->prev)->is_free == 1 && block->prev != NULL ) {
+    if (block->prev != NULL && (block->prev)->is_free == 1) {
         (block->prev)->is_free = block->is_free;
         (block->prev)->next = block->next;
+        (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
         if (block->next != NULL)
             (block->next)->prev = block->prev;
-        (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
     }
 
-    if ((block->next)->is_free == 1 && block->next != NULL) {
-        block->size = block->size + sizeof(s_block) +(block->next)->size;
+    if (block->next != NULL && (block->next)->is_free == 1) {
         block->next = (block->next)->next;
         (block->next)->prev = block;
+        block->size = block->size + sizeof(s_block) +(block->next)->size;
     }
 }
 
+
+void *initial_heap(size_t size) {
+
+    if (sbrk(size + sizeof(s_block)) == (void *)-1)
+        return NULL;
+
+    head_pointer = sbrk(0);
+
+    head_pointer->next = NULL;
+    head_pointer->prev = NULL;
+    head_pointer->size = size ;
+    head_pointer->is_free = 0;
+    head_pointer->ptr = head_pointer + sizeof(s_block);
+
+    memset(head_pointer->ptr, 0, head_pointer->size);
+    return head_pointer->ptr;
+}
 
 void* mm_malloc(size_t size)
 {
     if (size == 0)
         return NULL;
-    
+
     if (head_pointer == NULL)
-        return extend_heap(NULL, size);
-    
+        return initial_heap(size);
+    printf("12");
     s_block_ptr prev = NULL;
 
     for (s_block_ptr head = head_pointer; head; head = head->next)
@@ -123,5 +139,13 @@ void* mm_realloc(void* ptr, size_t size)
 
 void mm_free(void* ptr)
 {
-
+    if (ptr == NULL)
+        return;
+    
+    s_block_ptr block = get_block(ptr);
+    
+    if(block){
+        block->is_free = 1;
+        fusion(block);
+    }
 }
