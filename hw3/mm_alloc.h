@@ -26,7 +26,7 @@ void mm_free(void* ptr);
 typedef struct s_block *s_block_ptr;
 
 /* block struct */
-struct s_block {
+typedef struct s_block {
     size_t size;
     struct s_block *next;
     struct s_block *prev;
