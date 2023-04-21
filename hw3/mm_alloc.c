@@ -123,8 +123,8 @@ void* mm_malloc(size_t size)
     for (s_block_ptr head = head_pointer; head; head = head->next)
     {
         if (head->is_free == 1 && head->size >= size) {
-            split_block(head, size);
             head->is_free = 0;
+            split_block(head, size);
 			return head->ptr;
         }
         prev = head;
