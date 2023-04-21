@@ -1,7 +1,7 @@
 /*
  * mm_alloc.h
  *
- * Exports a clone of the interface documented in "man 3 malloc".
+ * Exports a clone of the interface documented.
  */
 
 #pragma once
@@ -34,13 +34,13 @@ struct s_block {
     void *ptr;
     /* A pointer to the allocated block */
     char data [0];
- };
+ } s_block;
 
 /* Split block according to size, b must exist */
 void split_block (s_block_ptr b, size_t s);
 
 /* Try fusing block with neighbors */
-s_block_ptr fusion(s_block_ptr b);
+void fusion(s_block_ptr b);
 
 /* Get the block from addr */
 s_block_ptr get_block (void *p);
