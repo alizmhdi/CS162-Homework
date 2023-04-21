@@ -153,8 +153,10 @@ void* mm_realloc(void* ptr, size_t size)
 
 }
 
+
 void mm_free(void* ptr)
 {
+    return;
     if (ptr == NULL)
         return;
     
