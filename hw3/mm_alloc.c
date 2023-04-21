@@ -69,8 +69,8 @@ void* mm_malloc(size_t size)
     
     if (head_pointer == NULL)
         return extend_heap(NULL, size);
-        
-	s_block_ptr prev = NULL;
+    
+    s_block_ptr prev = NULL;
 
     for (s_block_ptr head = head_pointer; head; head = head->next)
     {
@@ -87,6 +87,7 @@ void* mm_malloc(size_t size)
 
 void* mm_realloc(void* ptr, size_t size)
 {
+    return 0;
 }
 
 void mm_free(void* ptr)
