@@ -132,6 +132,7 @@ void* mm_malloc(size_t size)
     return extend_heap(prev, size);
 }
 
+
 void* mm_realloc(void* ptr, size_t size)
 {
     if (ptr == NULL)
