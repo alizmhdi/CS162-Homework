@@ -1,14 +1,24 @@
-I finished judging your code on 17-04-2023 at 14:13:47.
+I finished judging your code on 21-04-2023 at 10:02:46.
 
 Compile error...
 
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
-There is an occurrence of 'malloc' in 'mm_alloc.h' which is not allowed! Remove it and then submit again.\nPlease note that you have to completely remove the usages; commenting them out won't solve the problem! Because we search the file like CTRL+F
-There is an occurrence of 'free' in 'mm_alloc.c' which is not allowed! Remove it and then submit again.\nPlease note that you have to completely remove the usages; commenting them out won't solve the problem! Because we search the file like CTRL+F
-There is an occurrence of 'calloc' in 'mm_alloc.c' which is not allowed! Remove it and then submit again.\nPlease note that you have to completely remove the usages; commenting them out won't solve the problem! Because we search the file like CTRL+F
-There is an occurrence of 'realloc' in 'mm_alloc.c' which is not allowed! Remove it and then submit again.\nPlease note that you have to completely remove the usages; commenting them out won't solve the problem! Because we search the file like CTRL+F
-make: *** [Makefile:20: hard] Error 1
+mm_alloc.c: In function ‘mm_malloc’:
+mm_alloc.c:70:5: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   70 |     if (head_pointer == NULL)
+      |     ^~
+mm_alloc.c:73:2: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   73 |  s_block_ptr prev = NULL;
+      |  ^~~~~~~~~~~
+mm_alloc.c: In function ‘mm_realloc’:
+mm_alloc.c:90:1: warning: control reaches end of non-void function [-Wreturn-type]
+   90 | }
+      | ^
+/usr/bin/ld: mm_test.o:/tester/students/mm_alloc.h:37: multiple definition of `s_block'; mm_alloc.o:/tester/students/mm_alloc.h:37: first defined here
+collect2: error: ld returned 1 exit status
+make[1]: *** [Makefile:23: malloc_test] Error 1
+make: *** [Makefile:20: hard] Error 2
 
 -----------<END AUTO GENERATED OUTPUT>------------
-Your final grade is: 0/100.0epoch: 1681740827
+Your final grade is: 0/100.0epoch: 1682071366
