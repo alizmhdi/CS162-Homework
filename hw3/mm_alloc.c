@@ -49,6 +49,8 @@ s_block_ptr extend_heap (s_block_ptr last , size_t s)
 
     if (last)
         last->next = block;
+    else
+        head_pointer = block;
 
     block->next = NULL;
     block->prev = last;
@@ -113,7 +115,7 @@ void* mm_malloc(size_t size)
         return NULL;
 
     if (head_pointer == NULL)
-        return initial_heap(size);
+        return extend_heap(NULL, size);
 
     s_block_ptr prev = NULL;
 
