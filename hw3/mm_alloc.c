@@ -78,19 +78,18 @@ s_block_ptr get_block (void *ptr)
 void fusion(s_block_ptr block)
 {
     if (block->next != NULL && (block->next)->is_free) {
+        block->size = block->size + sizeof(s_block) +(block->next)->size;
         block->next = (block->next)->next;
         (block->next)->prev = block;
-        block->size = block->size + sizeof(s_block) +(block->next)->size;
     }
 
     if (block->prev != NULL && (block->prev)->is_free) {
+        (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
         (block->prev)->next = block->next;
         if (block->next != NULL)
             (block->next)->prev = block->prev;
         (block->prev)->is_free = block->is_free;
-        (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
     }
-
 }
 
 
@@ -131,8 +130,8 @@ void* mm_malloc(size_t size)
     for (s_block_ptr head = head_pointer; head; head = head->next)
     {
         if (head->is_free == 1 && head->size >= size) {
+            head->is_free = 0;
             split_block(head, size);
-			head->is_free = 0;
             return head->ptr;
         }
         prev = head;
