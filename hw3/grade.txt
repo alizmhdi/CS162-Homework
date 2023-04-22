@@ -1,11 +1,106 @@
-I finished judging your code on 22-04-2023 at 07:32:04.
+I finished judging your code on 22-04-2023 at 07:36:01.
 
-Compile error...
+I ran your code on each test case separately! You can see the results below:
 
+================================================================================================================
+Test 1: Simple test of alloc and free --> OK! 1.95 points; Afarin!!!
+================================================================================================================
+
+
+================================================================================================================
+Test 2: Test of exceptional cases --> OK! 2.15 points; Afarin!!!
+================================================================================================================
+
+
+================================================================================================================
+Test 3: Fusion simple test --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
 ----------<BEGIN AUTO GENERATED OUTPUT>-----------
 
-There is an occurrence of 'free' in 'mm_alloc.c' which is not allowed! Remove it and then submit again.\nPlease note that you have to completely remove the usages; commenting them out won't solve the problem! Because we search the file like CTRL+F
-make: *** [Makefile:20: hard] Error 1
+Ok I just assured that you couldn't allocated 800 GB.
+I guess fusion is not working...
 
 -----------<END AUTO GENERATED OUTPUT>------------
-Your final grade is: 0/100.0epoch: 1682148725
+================================================================================================================
+
+
+================================================================================================================
+Test 4: Fusion complicated test --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+Ok I just assured that you couldn't allocated 800 GB.
+I guess fusion is not working...
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 5: Split block simple test --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+Ok I just assured that you couldn't allocated 800 GB.
+Apparently Split block is not working
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 6: Test large amount of data --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+Ok I just assured that you couldn't allocated 800 GB.
+You passed the first step...
+Maybe fusion is not working!
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 7: A combination of fusion and split block --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+Ok I just assured that you couldn't allocated 800 GB.
+Step 1 failed: I guess fusion isn't working properly.
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 8: Realloc simple test --> OK! 6.1 points; Afarin!!!
+================================================================================================================
+
+
+================================================================================================================
+Test 9: Realloc complicated test --> Runtime error occurred (Exit code: 1)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+Ok I just assured that you couldn't allocated 800 GB.
+You didn't zero data in realloc
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+
+================================================================================================================
+Test 10: Two dimensional array with arithmetic calculations on a real-world problem --> Runtime error occurred (Exit code: -11)
+Although you got no points from this test, below is the output of the test (STDOUT):
+----------<BEGIN AUTO GENERATED OUTPUT>-----------
+
+Ok you have allocated the array so far.
+Your answer is correct.
+Now we're gonna test with some reallocs!
+The first step is ok!
+
+-----------<END AUTO GENERATED OUTPUT>------------
+================================================================================================================
+
+Your final grade is: 10.2/100.0epoch: 1682148962
