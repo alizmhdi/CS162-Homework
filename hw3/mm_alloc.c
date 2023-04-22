@@ -8,7 +8,7 @@ s_block_ptr head_pointer = NULL;
 
 
 /*
- * In this function, we check that if the size of the free! block 
+ * In this function, we check that if the size of the fre block 
  * is greater than or equal to the required size, we split it.
  */
 void split_block (s_block_ptr block, size_t size)
@@ -72,7 +72,7 @@ s_block_ptr get_block (void *ptr)
 }
 
 /*
- * In this function, we check that if the blocks before and after a block were free, 
+ * In this function, we check that if the blocks before and after a block were fre, 
  * we merge them with the block itself to use the optimal memory.
  */
 void fusion(s_block_ptr block)
