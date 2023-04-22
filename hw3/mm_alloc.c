@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <memory.h>
-#include <stdio.h>
 
 
 s_block_ptr head_pointer = NULL;
@@ -74,20 +73,19 @@ s_block_ptr get_block (void *ptr)
 void fusion(s_block_ptr block)
 {
     if (block->next != NULL && (block->next)->is_free) {
+        block->size = block->size + sizeof(s_block) +(block->next)->size;
         block->next = (block->next)->next;
         (block->next)->prev = block;
-        block->size = block->size + sizeof(s_block) +(block->next)->size;
     }
 
     if (block->prev != NULL && (block->prev)->is_free) {
-        (block->prev)->is_free = block->is_free;
-        (block->prev)->next = block->next;
         (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
-        if ((block->prev)->prev != NULL)
-            block->prev = block->prev->prev;
+        (block->prev)->next = block->next;
         if (block->next != NULL)
             (block->next)->prev = block->prev;
+        (block->prev)->is_free = block->is_free;
     }
+
 }
 
 
@@ -117,11 +115,11 @@ void* mm_malloc(size_t size)
 
 void* mm_realloc(void* ptr, size_t size)
 {
-    if (ptr == NULL)
-        return mm_malloc(size);
-    
     if (size == 0)
         return NULL;
+        
+    if (ptr == NULL)
+        return mm_malloc(size);
 
     s_block_ptr block = get_block(ptr);
     if (block){
