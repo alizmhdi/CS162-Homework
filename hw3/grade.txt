@@ -1,4 +1,4 @@
-I finished judging your code on 22-04-2023 at 07:00:41.
+I finished judging your code on 22-04-2023 at 07:13:53.
 
 I ran your code on each test case separately! You can see the results below:
 
@@ -18,14 +18,7 @@ Test 3: Fusion simple test --> OK! 4.5 points; Afarin!!!
 
 
 ================================================================================================================
-Test 4: Fusion complicated test --> Runtime error occurred (Exit code: 1)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
-Ok I just assured that you couldn't allocated 800 GB.
-I guess fusion is not working...
-
------------<END AUTO GENERATED OUTPUT>------------
+Test 4: Fusion complicated test --> OK! 11.5 points; Afarin!!!
 ================================================================================================================
 
 
@@ -35,27 +28,12 @@ Test 5: Split block simple test --> OK! 7.5 points; Afarin!!!
 
 
 ================================================================================================================
-Test 6: Test large amount of data --> Runtime error occurred (Exit code: 1)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
-Ok I just assured that you couldn't allocated 800 GB.
-You passed the first step...
-Maybe fusion is not working!
-
------------<END AUTO GENERATED OUTPUT>------------
+Test 6: Test large amount of data --> OK! 10 points; Afarin!!!
 ================================================================================================================
 
 
 ================================================================================================================
-Test 7: A combination of fusion and split block --> Runtime error occurred (Exit code: 1)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
-Ok I just assured that you couldn't allocated 800 GB.
-Step 1 failed: I guess fusion isn't working properly.
-
------------<END AUTO GENERATED OUTPUT>------------
+Test 7: A combination of fusion and split block --> OK! 25 points; Afarin!!!
 ================================================================================================================
 
 
@@ -65,13 +43,7 @@ Test 8: Realloc simple test --> OK! 6.1 points; Afarin!!!
 
 
 ================================================================================================================
-Test 9: Realloc complicated test --> Runtime error occurred (Exit code: -11)
-Although you got no points from this test, below is the output of the test (STDOUT):
-----------<BEGIN AUTO GENERATED OUTPUT>-----------
-
-Ok I just assured that you couldn't allocated 800 GB.
-
------------<END AUTO GENERATED OUTPUT>------------
+Test 9: Realloc complicated test --> OK! 17.5 points; Afarin!!!
 ================================================================================================================
 
 
@@ -79,4 +51,4 @@ Ok I just assured that you couldn't allocated 800 GB.
 Test 10: Two dimensional array with arithmetic calculations on a real-world problem --> OK! 13.8 points; Afarin!!!
 ================================================================================================================
 
-Your final grade is: 36.0/100.0epoch: 1682146841
+Your final grade is: 100.0/100.0epoch: 1682147634
