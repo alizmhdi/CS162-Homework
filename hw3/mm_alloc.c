@@ -1,8 +1,3 @@
-/*
- * mm_alloc.c
- *
- */
-
 #include "mm_alloc.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -12,6 +7,10 @@
 s_block_ptr head_pointer = NULL;
 
 
+/*
+ * In this function, we check that if the size of the free! block 
+ * is greater than or equal to the required size, we split it.
+ */
 void split_block (s_block_ptr block, size_t size)
 {
     if (block == NULL || size <= 0)
@@ -19,22 +18,25 @@ void split_block (s_block_ptr block, size_t size)
 
     if(block->size >= size + sizeof(s_block)) {
         s_block_ptr ptr = (s_block_ptr) (block->ptr + size);
-        ptr->prev = block;
+        
         if (block->next)
             (block->next)->prev = ptr;
 
         ptr->next = block->next;
         block->next = ptr;
+        ptr->prev = block;
         ptr->size = block->size - size - sizeof(s_block);
-        ptr->ptr = block->ptr + size + sizeof(s_block);
         block->size = size;
+        ptr->ptr = block->ptr + size + sizeof(s_block);
 
         mm_free(ptr->ptr);
         memset(block->ptr, 0, block->size);
     }
 }
 
-
+/*
+ * In this function, we try to create a new block and we do this using the sbrk system call.
+ */
 s_block_ptr extend_heap (s_block_ptr last , size_t s)
 {
     void *ptr = sbrk(s + sizeof(s_block));
@@ -69,23 +71,51 @@ s_block_ptr get_block (void *ptr)
     return NULL;
 }
 
-
+/*
+ * In this function, we check that if the blocks before and after a block were free, 
+ * we merge them with the block itself to use the optimal memory.
+ */
 void fusion(s_block_ptr block)
 {
-    if (block->next != NULL && (block->next)->is_free) {
-        block->size = block->size + sizeof(s_block) +(block->next)->size;
-        block->next = (block->next)->next;
-        (block->next)->prev = block;
-    }
-
     if (block->prev != NULL && (block->prev)->is_free) {
-        (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
+        (block->prev)->is_free = block->is_free;
         (block->prev)->next = block->next;
         if (block->next != NULL)
             (block->next)->prev = block->prev;
-        (block->prev)->is_free = block->is_free;
+        if ((block->prev)->prev != NULL)
+            block->prev = block->prev->prev;
+        (block->prev)->size = (block->prev)->size + sizeof(s_block) + block->size;
     }
 
+    if (block->next != NULL && (block->next)->is_free) {
+        block->next = (block->next)->next;
+        (block->next)->prev = block;
+        block->size = block->size + sizeof(s_block) +(block->next)->size;
+    }
+}
+
+
+/*
+ * In this function, we create a block for head of list.
+ */
+s_block_ptr initial_heap (size_t s)
+{
+    void *ptr = sbrk(s + sizeof(s_block));
+
+    if (ptr == (void *) -1)
+        return NULL;
+
+    head_pointer = (s_block_ptr) ptr;
+
+    head_pointer->next = NULL;
+    head_pointer->prev = NULL;
+    head_pointer->is_free = 0;
+    head_pointer->size = s;
+    head_pointer->ptr = ptr + sizeof(s_block);
+
+    memset(head_pointer->ptr, 0, head_pointer->size);
+
+    return head_pointer->ptr;
 }
 
 
@@ -95,16 +125,16 @@ void* mm_malloc(size_t size)
         return NULL;
 
     if (head_pointer == NULL)
-        return extend_heap(NULL, size);
+        return initial_heap(size);
 
     s_block_ptr prev = NULL;
 
     for (s_block_ptr head = head_pointer; head; head = head->next)
     {
         if (head->is_free == 1 && head->size >= size) {
-            head->is_free = 0;
             split_block(head, size);
-			return head->ptr;
+			head->is_free = 0;
+            return head->ptr;
         }
         prev = head;
     }
@@ -117,7 +147,7 @@ void* mm_realloc(void* ptr, size_t size)
 {
     if (size == 0)
         return NULL;
-        
+
     if (ptr == NULL)
         return mm_malloc(size);
 
