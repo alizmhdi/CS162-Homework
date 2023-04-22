@@ -1,3 +1,12 @@
+/*
+ * First, we initialize the heap with a block.
+ * In the next steps, when we want to allocate, we first check whether there is a fre block 
+ * with a size larger than the required size or not. If there is, we will split it. 
+ * If it doesn't exist, we call extend_block and call the sbrk system call.
+ * When releasing a block, we check at each step whether there is a fre block around that block or not. 
+ * If there is, we will join the two blocks (using fusion).
+*/
+
 #include "mm_alloc.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -64,10 +73,15 @@ s_block_ptr extend_heap (s_block_ptr last , size_t s)
 
 s_block_ptr get_block (void *ptr)
 {
-    for (s_block_ptr head = head_pointer; head; head = head->next) {
+    s_block_ptr head = head_pointer;
+
+    while (head)
+    {
         if (head->ptr == ptr)
             return head;
+        head = head->next;
     }
+
     return NULL;
 }
 
@@ -126,8 +140,9 @@ void* mm_malloc(size_t size)
         return initial_heap(size);
 
     s_block_ptr prev = NULL;
+    s_block_ptr head = head_pointer;
 
-    for (s_block_ptr head = head_pointer; head; head = head->next)
+    while (head)
     {
         if (head->is_free == 1 && head->size >= size) {
             head->is_free = 0;
@@ -135,7 +150,9 @@ void* mm_malloc(size_t size)
             return head->ptr;
         }
         prev = head;
+        head = head->next;
     }
+    
 
     return extend_heap(prev, size);
 }
