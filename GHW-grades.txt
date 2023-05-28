@@ -1,3 +1,7 @@
 ================ GHW1 ================
 Group #,Warmup,Acquintance,Design,Additional Qs,Delay (hours),Total,Passed Tests,Total,Quality,Commits,Doc,Delay (hours),Delay (percent),Sum,Total (Delayed),Total
 7,100,90,100,100,0,99,100,100,100,100,100,0,0,100,100,99.8
+
+================ GHW3 ================
+Group #,Design,Additional Qs,Total,Passed Tests,Total,Grade,Total,Quality,Commits,Doc,Total,Sum 2nd deadline,Final
+7,100,100,200,100,100,100,100,100,100,100,100,85,100
